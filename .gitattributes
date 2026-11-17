@@ -1,0 +1,7 @@
+# Normalise line endings so Windows (CRLF) and Linux/macOS (LF) users don't get noisy diffs
+* text=auto
+
+# Binary files
+*.png binary
+*.jpg binary
+*.ico binary

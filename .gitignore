@@ -1,0 +1,32 @@
+# ===== Secrets / local configuration (NEVER commit these) =====
+config.php
+config.local.php
+.env
+.env.*
+
+# ===== Logs and temporary files =====
+*.log
+error_log
+*.tmp
+*.bak
+
+# ===== Uploads / generated files =====
+uploads/
+cache/
+
+# ===== Dependencies =====
+node_modules/
+vendor/
+
+# ===== Editor / IDE files =====
+.vscode/
+.idea/
+*.swp
+
+# ===== OS files =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Archives =====
+*.zip
