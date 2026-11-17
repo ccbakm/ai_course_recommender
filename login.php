@@ -105,7 +105,7 @@ include __DIR__.'/partials/header.php';
                         <input type="checkbox" name="remember" id="remember">
                         <span>Remember me</span>
                     </label>
-                    <a href="<?php echo url_path('/forgot-password.php'); ?>" class="link">Forgot password?</a>
+                    
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block">
