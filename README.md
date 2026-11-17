@@ -40,7 +40,7 @@ Users can save plans, mark topics as complete, write notes, and take **AI-genera
 
 | Name | Roll No. | GitHub | Contribution |
 | ---- | -------- | ------ | ------------ |
-| [TODO: Your Name] | [TODO: Roll No.] | [@your-github-username](https://github.com/your-github-username) | [TODO: summarise what you built, e.g. authentication, plan generation, quizzes, dashboard, documentation] |
+| Ayush | 18 | [@ccbakm](https://github.com/ccbakm) | Completed this assignment individually: repository setup, feature branches, pull requests and reviews, merge-conflict resolution, and Markdown documentation |
 
 > A detailed breakdown of commits, branches, pull requests and reviews is in [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -106,6 +106,7 @@ ai_course_recommender/
 - [XAMPP](https://www.apachefriends.org/) (Apache + MySQL/MariaDB + PHP)
 - [Git](https://git-scm.com/downloads)
 - A free **Gemini API key** from [Google AI Studio](https://aistudio.google.com/apikey)
+- *(Recommended)* A **YouTube Data API v3 key** from [Google Cloud Console](https://console.cloud.google.com/) – see the note in step 4
 
 ### Steps
 
@@ -115,7 +116,7 @@ ai_course_recommender/
 
 ```bash
 cd C:\xampp\htdocs
-git clone https://github.com/your-github-username/ai_course_recommender.git
+git clone https://github.com/ccbakm/ai_course_recommender.git
 ```
 
 > ⚠️ Keep the folder name `ai_course_recommender`. If you rename it, update `$APP_BASE` in `config.php`.
@@ -134,11 +135,16 @@ copy config.example.php config.php        # Windows
 # cp config.example.php config.php        # macOS / Linux
 ```
 
-Open `config.php` and set your key:
+Open `config.php` and set your keys:
 
 ```php
-$GEMINI_API_KEY = 'paste-your-key-here';
+$GEMINI_API_KEY  = 'paste-your-gemini-key-here';
+$YOUTUBE_API_KEY = 'paste-your-youtube-key-here';   // recommended
 ```
+
+> 🎥 **About the YouTube key:** with a key, every topic in a learning plan links to a specific, relevant YouTube video. Without it, the app still works, but each topic links to a YouTube *search results* page instead.
+>
+> To get a key: open [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services → Library** → enable **YouTube Data API v3** → **Credentials → Create credentials → API key**.
 
 **5. Open the app** at <http://localhost/ai_course_recommender/>
 
