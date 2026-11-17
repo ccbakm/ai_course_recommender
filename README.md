@@ -166,7 +166,7 @@ $YOUTUBE_API_KEY = 'paste-your-youtube-key-here';   // recommended
 | ---- | ------------------- |
 | ![Quiz](docs/screenshots/quiz.png) | ![Dashboard](docs/screenshots/dashboard.png) |
 
-*(Add your screenshots to `docs/screenshots/` using the file names above.)*
+
 
 ## 🔀 Git and GitHub Workflow
 
