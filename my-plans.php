@@ -108,6 +108,48 @@ include __DIR__.'/partials/header.php';
                 </a>
             </div>
         <?php else: ?>
+
+<!-- Search and filter learning plans -->
+<div class="plans-search">
+    <div class="plan-search-control">
+        <label for="plan-search">Search Learning Plans</label>
+        <div class="search-input-wrapper">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+
+            <input type="search"
+                   id="plan-search"
+                   placeholder="Search by plan title or domain..."
+                   autocomplete="off">
+
+            <!-- Clear Search Button -->
+            <button type="button"
+                    id="clear-plan-search"
+                    class="clear-search-btn"
+                    aria-label="Clear search"
+                    hidden>
+                <svg viewBox="0 0 24 24"
+                     width="18" height="18"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter learning plans by status -->
+    <div class="plan-status-filter">
+        <label for="plan-status-filter">Filter by Status</label>
+        <select id="plan-status-filter" class="status-filter-select">
+            <option value="all">All Plans</option>
+            <option value="active">Active Plans</option>
+            <option value="inactive">Inactive Plans</option>
+        </select>
+    </div>
+</div> <!-- Cards stay outside the search and filter area -->
+
             <div class="plans-list">
                 <?php foreach ($plans as $plan): 
                     $plan_data = json_decode($plan['plan_data'], true);
@@ -115,7 +157,7 @@ include __DIR__.'/partials/header.php';
                         ? round(($plan['completed_topics'] / $plan['total_topics']) * 100, 1) 
                         : 0;
                 ?>
-                    <div class="plan-card card <?php echo $plan['is_active'] ? 'active-plan' : ''; ?>">
+                    <div class="plan-card card <?php echo $plan['is_active'] ? 'active-plan' : ''; ?>" data-active="<?php echo $plan['is_active'] ? '1' : '0'; ?>">
                         <div class="plan-card-header">
                             <div class="plan-title-section">
                                 <?php if ($plan['is_active']): ?>
@@ -132,10 +174,13 @@ include __DIR__.'/partials/header.php';
                                 <button class="icon-btn" onclick="viewPlan(<?php echo $plan['id']; ?>)" title="View Plan">
                                     👁️
                                 </button>
-                                <button class="icon-btn" onclick="toggleActive(<?php echo $plan['id']; ?>)" 
-                                        title="<?php echo $plan['is_active'] ? 'Deactivate' : 'Set as Active'; ?>">
-                                    <?php echo $plan['is_active'] ? '⭐' : '☆'; ?>
-                                </button>
+                                
+<button class="icon-btn"
+        onclick="toggleActive(<?php echo $plan['id']; ?>, <?php echo $plan['is_active'] ? 'true' : 'false'; ?>)"
+        title="<?php echo $plan['is_active'] ? 'Deactivate' : 'Set as Active'; ?>">
+    <?php echo $plan['is_active'] ? '⭐' : '☆'; ?>
+</button>
+
                                 <button class="icon-btn danger" onclick="deletePlan(<?php echo $plan['id']; ?>)" title="Delete Plan">
                                     🗑️
                                 </button>
@@ -169,9 +214,25 @@ include __DIR__.'/partials/header.php';
                             </div>
                         </div>
                     </div>
+                
                 <?php endforeach; ?>
             </div>
+
+            <!-- Message displayed when search finds no plans -->
+            <div id="search-no-results"
+                 class="empty-state card"
+                 style="display: none;"
+                 role="status"
+                 aria-live="polite">
+
+                <div class="empty-icon">🔍</div>
+                <h3>No Matching Plans Found</h3>
+                <p>Try a different search term to find your learning plans.</p>
+
+            </div>
+
         <?php endif; ?>
+
     </div>
 </section>
 
@@ -252,6 +313,143 @@ include __DIR__.'/partials/header.php';
     color: var(--text-muted);
     margin-bottom: 24px;
 }
+
+
+/* Learning Plans Search */
+
+.plans-search {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.plan-search-control {
+    flex: 1 1 360px;
+    max-width: 500px;
+    min-width: 0;
+}
+
+.plan-status-filter {
+    flex: 0 1 230px;
+    min-width: 180px;
+}
+
+.status-filter-select {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--bg-darker);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.status-filter-select:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(124, 77, 255, 0.15);
+}
+
+.status-filter-select option {
+    background: var(--bg-darker);
+    color: var(--text-primary);
+}
+
+.plans-search label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+
+.search-input-wrapper {
+    position: relative;
+    max-width: 500px;
+}
+
+
+.search-input-wrapper input {
+    width: 100%;
+    padding: 14px 18px 14px 48px;
+    background: var(--bg-darker);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-input-wrapper input:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(124, 77, 255, 0.15);
+}
+
+.search-input-wrapper input::placeholder {
+    color: var(--text-muted);
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    pointer-events: none;
+}
+
+
+/* Clear Search Button */
+.clear-search-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clear-search-btn:hover {
+    background: rgba(124, 77, 255, 0.15);
+    color: var(--brand);
+}
+
+.clear-search-btn:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+/* Keep the button hidden when search is empty */
+.clear-search-btn[hidden] {
+    display: none;
+}
+
+/* Leave space inside the input for the button */
+.search-input-wrapper input {
+    padding-right: 50px;
+}
+
+/* Hide the browser's default clear button */
+.search-input-wrapper input::-webkit-search-cancel-button {
+    display: none;
+}
+
+
 
 .plans-list {
     display: grid;
@@ -392,6 +590,13 @@ include __DIR__.'/partials/header.php';
 }
 
 @media (max-width: 768px) {
+    .plan-search-control,
+    .plan-status-filter {
+        flex: 1 1 100%;
+        max-width: 500px;
+        min-width: 0;
+    }
+
     .plans-header {
         flex-direction: column;
         align-items: flex-start;
@@ -436,23 +641,36 @@ function viewPlan(planId) {
     window.location.href = '<?php echo url_path('/plan-details.php?id='); ?>' + planId;
 }
 
-function toggleActive(planId) {
-    if (confirm('Set this plan as your active learning plan?')) {
-        fetch('<?php echo url_path('/api/toggle-active.php'); ?>', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ plan_id: planId })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert(data.error || 'Failed to update plan');
-            }
-        });
+
+function toggleActive(planId, isActive) {
+    // Show the correct confirmation message
+    const message = isActive
+        ? 'Are you sure you want to deactivate this learning plan?'
+        : 'Set this plan as your active learning plan?';
+
+    if (!confirm(message)) {
+        return;
     }
+
+    fetch('<?php echo url_path('/api/toggle-active.php'); ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan_id: planId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.error || 'Failed to update plan');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating plan:', error);
+        alert('Something went wrong. Please try again.');
+    });
 }
+
 
 function deletePlan(planId) {
     if (confirm('Are you sure you want to delete this learning plan? This action cannot be undone.')) {
@@ -471,6 +689,73 @@ function deletePlan(planId) {
         });
     }
 }
+
+
+
+
+/* Live search and status filtering for saved learning plans */
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('plan-search');
+    const clearButton = document.getElementById('clear-plan-search');
+    const statusFilter = document.getElementById('plan-status-filter');
+    const planCards = document.querySelectorAll('.plans-list .plan-card');
+    const noResults = document.getElementById('search-no-results');
+
+    if (!searchInput || !clearButton || !statusFilter) return;
+
+    function filterPlans() {
+        const searchText = searchInput.value.toLowerCase().trim();
+        const selectedStatus = statusFilter.value;
+        let visibleCount = 0;
+
+        planCards.forEach(function (card) {
+            const title = card.querySelector('.plan-title-section h3')
+                              .textContent.toLowerCase();
+
+            const domain = card.querySelector('.plan-meta .meta-item')
+                               .textContent.toLowerCase();
+
+            const matchesSearch = title.includes(searchText) ||
+                                  domain.includes(searchText);
+
+            const isActive = card.dataset.active === '1';
+            const matchesStatus = selectedStatus === 'all' ||
+                                  (selectedStatus === 'active' && isActive) ||
+                                  (selectedStatus === 'inactive' && !isActive);
+
+            const matches = matchesSearch && matchesStatus;
+            card.style.display = matches ? '' : 'none';
+
+            if (matches) {
+                visibleCount++;
+            }
+        });
+
+        // Show the no-results message if search and filter match nothing
+        if (noResults) {
+            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+
+        // Only show the clear button when search contains text
+        clearButton.hidden = searchInput.value.length === 0;
+    }
+
+    // Search and status filtering work together
+    searchInput.addEventListener('input', filterPlans);
+    statusFilter.addEventListener('change', filterPlans);
+
+    // Clear the search term, preserving the selected status filter
+    clearButton.addEventListener('click', function () {
+        searchInput.value = '';
+        filterPlans();
+        searchInput.focus();
+    });
+
+    filterPlans();
+});
+
+
+
 </script>
 
 <?php include __DIR__.'/partials/footer.php'; ?>
