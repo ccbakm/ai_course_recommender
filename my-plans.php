@@ -109,36 +109,46 @@ include __DIR__.'/partials/header.php';
             </div>
         <?php else: ?>
 
-<!-- Search learning plans -->
+<!-- Search and filter learning plans -->
 <div class="plans-search">
-    <label for="plan-search">Search Learning Plans</label>
+    <div class="plan-search-control">
+        <label for="plan-search">Search Learning Plans</label>
+        <div class="search-input-wrapper">
+            <span class="search-icon" aria-hidden="true">🔍</span>
 
+            <input type="search"
+                   id="plan-search"
+                   placeholder="Search by plan title or domain..."
+                   autocomplete="off">
 
-<div class="search-input-wrapper">
-    <span class="search-icon" aria-hidden="true">🔍</span>
+            <!-- Clear Search Button -->
+            <button type="button"
+                    id="clear-plan-search"
+                    class="clear-search-btn"
+                    aria-label="Clear search"
+                    hidden>
+                <svg viewBox="0 0 24 24"
+                     width="18" height="18"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
 
-    <input type="search"
-           id="plan-search"
-           placeholder="Search by plan title or domain..."
-           autocomplete="off">
-
-    <!-- Clear Search Button -->
-    <button type="button"
-            id="clear-plan-search"
-            class="clear-search-btn"
-            aria-label="Clear search"
-            hidden>
-        <svg viewBox="0 0 24 24"
-             width="18" height="18"
-             fill="none"
-             stroke="currentColor"
-             stroke-width="2"
-             stroke-linecap="round">
-            <path d="M18 6L6 18M6 6l12 12"/>
-        </svg>
-    </button>
-</div>
-</div> <!-- Close plans-search, keeping cards outside the search container -->
+    <!-- Filter learning plans by status -->
+    <div class="plan-status-filter">
+        <label for="plan-status-filter">Filter by Status</label>
+        <select id="plan-status-filter" class="status-filter-select">
+            <option value="all">All Plans</option>
+            <option value="active">Active Plans</option>
+            <option value="inactive">Inactive Plans</option>
+        </select>
+    </div>
+</div> <!-- Cards stay outside the search and filter area -->
 
             <div class="plans-list">
                 <?php foreach ($plans as $plan): 
@@ -147,7 +157,7 @@ include __DIR__.'/partials/header.php';
                         ? round(($plan['completed_topics'] / $plan['total_topics']) * 100, 1) 
                         : 0;
                 ?>
-                    <div class="plan-card card <?php echo $plan['is_active'] ? 'active-plan' : ''; ?>">
+                    <div class="plan-card card <?php echo $plan['is_active'] ? 'active-plan' : ''; ?>" data-active="<?php echo $plan['is_active'] ? '1' : '0'; ?>">
                         <div class="plan-card-header">
                             <div class="plan-title-section">
                                 <?php if ($plan['is_active']): ?>
@@ -308,9 +318,46 @@ include __DIR__.'/partials/header.php';
 /* Learning Plans Search */
 
 .plans-search {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
     margin-bottom: 28px;
 }
 
+.plan-search-control {
+    flex: 1 1 360px;
+    max-width: 500px;
+    min-width: 0;
+}
+
+.plan-status-filter {
+    flex: 0 1 230px;
+    min-width: 180px;
+}
+
+.status-filter-select {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--bg-darker);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.status-filter-select:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(124, 77, 255, 0.15);
+}
+
+.status-filter-select option {
+    background: var(--bg-darker);
+    color: var(--text-primary);
+}
 
 .plans-search label {
     display: block;
@@ -543,6 +590,13 @@ include __DIR__.'/partials/header.php';
 }
 
 @media (max-width: 768px) {
+    .plan-search-control,
+    .plan-status-filter {
+        flex: 1 1 100%;
+        max-width: 500px;
+        min-width: 0;
+    }
+
     .plans-header {
         flex-direction: column;
         align-items: flex-start;
@@ -639,17 +693,19 @@ function deletePlan(planId) {
 
 
 
-/* Live search for saved learning plans */
+/* Live search and status filtering for saved learning plans */
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('plan-search');
     const clearButton = document.getElementById('clear-plan-search');
+    const statusFilter = document.getElementById('plan-status-filter');
     const planCards = document.querySelectorAll('.plans-list .plan-card');
     const noResults = document.getElementById('search-no-results');
 
-    if (!searchInput || !clearButton) return;
+    if (!searchInput || !clearButton || !statusFilter) return;
 
     function filterPlans() {
         const searchText = searchInput.value.toLowerCase().trim();
+        const selectedStatus = statusFilter.value;
         let visibleCount = 0;
 
         planCards.forEach(function (card) {
@@ -659,9 +715,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const domain = card.querySelector('.plan-meta .meta-item')
                                .textContent.toLowerCase();
 
-            const matches = title.includes(searchText) ||
-                            domain.includes(searchText);
+            const matchesSearch = title.includes(searchText) ||
+                                  domain.includes(searchText);
 
+            const isActive = card.dataset.active === '1';
+            const matchesStatus = selectedStatus === 'all' ||
+                                  (selectedStatus === 'active' && isActive) ||
+                                  (selectedStatus === 'inactive' && !isActive);
+
+            const matches = matchesSearch && matchesStatus;
             card.style.display = matches ? '' : 'none';
 
             if (matches) {
@@ -669,27 +731,26 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Display message when no plans match
+        // Show the no-results message if search and filter match nothing
         if (noResults) {
-            noResults.style.display =
-                visibleCount === 0 ? 'block' : 'none';
+            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
         }
 
-        // Show clear button only when search contains text
+        // Only show the clear button when search contains text
         clearButton.hidden = searchInput.value.length === 0;
     }
 
-    // Filter plans as the user types
+    // Search and status filtering work together
     searchInput.addEventListener('input', filterPlans);
+    statusFilter.addEventListener('change', filterPlans);
 
-    // Clear search when the X button is clicked
+    // Clear the search term, preserving the selected status filter
     clearButton.addEventListener('click', function () {
         searchInput.value = '';
         filterPlans();
         searchInput.focus();
     });
 
-    // Initialize the search state
     filterPlans();
 });
 
