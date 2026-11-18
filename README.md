@@ -46,10 +46,14 @@ Users can save plans, mark topics as complete, write notes, and take **AI-genera
 
 ## ✨ Features
 
-1. **User accounts** – registration, login, logout and a profile/settings page (name, email, skill level, password change). Passwords are stored as secure hashes.
+
+1. **User accounts** – registration, login, logout and profile/settings management. Includes Show/Hide Password eye icons on login and registration forms, stronger password requirements (minimum 8 characters, one letter and one number), and live password validation feedback. Passwords are securely hashed.
+
 2. **AI learning-plan generation** – personalised roadmap created with the Gemini API.
 3. **Video suggestions** – optional YouTube links for each topic (needs a YouTube API key).
-4. **Plan management** – save plans, view all plans, set one plan as *active*, delete plans, search saved plans by title or domain, and filter plans by active or inactive status.
+
+4. **Plan management** – save, view and delete learning plans; activate or deactivate plans (only one active at a time); search saved plans by title or domain; clear searches instantly; display helpful no-results feedback; and filter plans by All, Active or Inactive status.
+
 5. **Progress tracking** – mark topics complete and see overall completion.
 6. **Notes** – write and save notes against topics in a plan.
 7. **AI-generated quizzes** – three levels: topic (5 questions), step (10 questions) and full plan (50 questions). Quizzes are cached and answers are logged.
@@ -168,16 +172,52 @@ $YOUTUBE_API_KEY = 'paste-your-youtube-key-here';   // recommended
 
 
 
+
 ## 🔀 Git and GitHub Workflow
 
-- `main` always holds the stable, working version.
-- New work is done on **feature branches** and merged into `main` through **pull requests** after review.
-- Commit messages are short and descriptive, for example: `Add quiz score trend chart`.
+This project uses Git and GitHub for version control, feature development, pull requests, code reviews, and merge-conflict resolution.
 
-Full details are in [CONTRIBUTING.md](CONTRIBUTING.md). To see the history:
+### Branches
+
+| Branch | Purpose |
+| --- | --- |
+| `main` | Main branch containing the completed application |
+| `feature-member1` | Authentication and registration improvements (4 commits) |
+| `feature-member2` | Learning plan management improvements (4 commits) |
+| `conflict-member1` | README update describing plan search |
+| `conflict-member2` | README update describing status filtering |
+
+### Pull Requests and Code Reviews
+
+Two feature branches were merged into `main` through GitHub pull requests:
+
+1. [PR #1 – Authentication Improvements](https://github.com/ccbakm/ai_course_recommender/pull/1) – Password visibility toggles and stronger registration validation.
+2. [PR #2 – Learning Plan Management](https://github.com/ccbakm/ai_course_recommender/pull/2) – Live search, clear button, activation improvements, and status filtering.
+
+Both pull requests were tested and received published inline self-review comments before merging.
+
+### Merge Conflict Demonstration
+
+A deliberate merge conflict was created by modifying the same Plan management description in `README.md` differently on `conflict-member1` and `conflict-member2`.
+
+Git detected the conflict when merging the second branch into `main`. The conflict was resolved by combining both descriptions, preserving search and status-filtering functionality in the documentation.
+
+Screenshots of the conflict, resolution, and Git history were captured for the assignment report.
+
+### Git Commit History
+
+The repository history can be viewed using:
 
 ```bash
 git log --oneline --graph --all
+```
+
+**Contributor:** Ayush (GitHub: [@ccbakm](https://github.com/ccbakm)).
+
+Both feature branches and their reviews were completed individually. They represent separate development workstreams, not two different contributors.
+
+For detailed contributions, commit hashes, pull requests, reviews, and conflict-resolution steps, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ```
 
 ## 🔒 Security Notes
