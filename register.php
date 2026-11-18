@@ -112,18 +112,65 @@ include __DIR__.'/partials/header.php';
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="input" 
-                           placeholder="Min. 6 characters" required>
-                    <small class="helper">At least 6 characters</small>
-                </div>
 
-                <div class="form-group">
-                    <label for="confirm_password">Confirm Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" class="input" 
-                           placeholder="Re-enter password" required>
-                </div>
+<div class="form-group">
+    <label for="password">Password</label>
+    <div class="password-field">
+        <input type="password" id="password" name="password"
+               class="input" placeholder="Min. 6 characters" required>
+
+        <button type="button" class="password-toggle"
+                aria-label="Show password" aria-pressed="false"
+                onclick="togglePasswordField('password', this)">
+            <svg class="icon-eye" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7C20.268 16.057 16.478 19 12 19S3.732 16.057 2.458 12z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 3l18 18"/>
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M10.584 10.587a2 2 0 002.829 2.828"/>
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9.88 5.09A9.77 9.77 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.721 9.721 0 01-4.16 5.146M6.228 6.228A9.72 9.72 0 002.458 12c1.274 4.057 5.064 7 9.542 7a9.77 9.77 0 004.09-.89"/>
+            </svg>
+        </button>
+    </div>
+    <small class="helper">At least 6 characters</small>
+</div>
+
+<div class="form-group">
+    <label for="confirm_password">Confirm Password</label>
+    <div class="password-field">
+        <input type="password" id="confirm_password"
+               name="confirm_password" class="input"
+               placeholder="Re-enter password" required>
+
+        <button type="button" class="password-toggle"
+                aria-label="Show confirm password" aria-pressed="false"
+                onclick="togglePasswordField('confirm_password', this)">
+            <svg class="icon-eye" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7C20.268 16.057 16.478 19 12 19S3.732 16.057 2.458 12z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 3l18 18"/>
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M10.584 10.587a2 2 0 002.829 2.828"/>
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9.88 5.09A9.77 9.77 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.721 9.721 0 01-4.16 5.146M6.228 6.228A9.72 9.72 0 002.458 12c1.274 4.057 5.064 7 9.542 7a9.77 9.77 0 004.09-.89"/>
+            </svg>
+        </button>
+    </div>
+</div>
+
 
                 <button type="submit" class="btn btn-primary btn-block">
                     Create Account
@@ -210,6 +257,62 @@ include __DIR__.'/partials/header.php';
     box-shadow: 0 0 0 3px rgba(124, 77, 255, 0.1);
 }
 
+
+/* Password visibility toggle */
+.password-field {
+    position: relative;
+}
+
+.password-field .input {
+    padding-right: 52px;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.password-toggle:hover {
+    background: rgba(124, 77, 255, 0.12);
+    color: var(--brand);
+}
+
+.password-toggle:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+.password-toggle svg {
+    width: 20px;
+    height: 20px;
+}
+
+.password-toggle .icon-eye-off {
+    display: none;
+}
+
+.password-toggle.active .icon-eye {
+    display: none;
+}
+
+.password-toggle.active .icon-eye-off {
+    display: block;
+}
+
+
 .helper {
     display: block;
     margin-top: 4px;
@@ -267,5 +370,33 @@ include __DIR__.'/partials/header.php';
     color: #22c55e;
 }
 </style>
+
+
+<script>
+function togglePasswordField(fieldId, button) {
+    const passwordInput = document.getElementById(fieldId);
+
+    // Check whether the password is currently hidden
+    const isHidden = passwordInput.type === 'password';
+
+    // Switch between hidden and visible
+    passwordInput.type = isHidden ? 'text' : 'password';
+
+    // Switch the eye icon
+    button.classList.toggle('active', isHidden);
+
+    // Update accessibility labels
+    button.setAttribute(
+        'aria-label',
+        isHidden ? 'Hide password' : 'Show password'
+    );
+
+    button.setAttribute(
+        'aria-pressed',
+        isHidden ? 'true' : 'false'
+    );
+}
+</script>
+
 
 <?php include __DIR__.'/partials/footer.php'; ?>
