@@ -94,18 +94,44 @@ include __DIR__.'/partials/header.php';
                            placeholder="john@example.com" required autofocus>
                 </div>
 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="input" 
-                           placeholder="Enter your password" required>
-                </div>
+                
+<div class="form-group">
+    <label for="password">Password</label>
+
+    <div class="password-field">
+        <input type="password" id="password" name="password" class="input" 
+               placeholder="Enter your password" required>
+
+        <button type="button" class="password-toggle" id="toggle-password"
+                aria-label="Show password" aria-pressed="false"
+                onclick="togglePassword()">
+            <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                <circle cx="12" cy="12" r="3" />
+            </svg>
+
+            <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 3l18 18" />
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M10.584 10.587a2 2 0 102.829 2.828" />
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9.88 5.09A9.77 9.77 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.721 9.721 0 01-4.16 5.146M6.228 6.228A9.72 9.72 0 002.458 12c1.274 4.057 5.064 7 9.542 7a9.77 9.77 0 004.09-.89" />
+            </svg>
+        </button>
+    </div>
+</div>
+
 
                 <div class="form-group form-row">
                     <label class="checkbox-label">
                         <input type="checkbox" name="remember" id="remember">
                         <span>Remember me</span>
                     </label>
-                    <a href="<?php echo url_path('/forgot-password.php'); ?>" class="link">Forgot password?</a>
+                    
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block">
@@ -186,6 +212,59 @@ include __DIR__.'/partials/header.php';
     color: var(--text-primary);
     font-size: 14px;
     transition: all 0.3s ease;
+}
+
+.password-field {
+    position: relative;
+}
+
+.password-field .input {
+    padding-right: 52px;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.password-toggle:hover {
+    background: rgba(124, 77, 255, 0.12);
+    color: var(--brand);
+}
+
+.password-toggle:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(124, 77, 255, 0.15);
+}
+
+.password-toggle svg {
+    width: 20px;
+    height: 20px;
+}
+
+.password-toggle .icon-eye-off {
+    display: none;
+}
+
+.password-toggle.active .icon-eye {
+    display: none;
+}
+
+.password-toggle.active .icon-eye-off {
+    display: block;
 }
 
 .auth-form .input:focus {
@@ -282,5 +361,19 @@ include __DIR__.'/partials/header.php';
     font-family: 'Courier New', monospace;
 }
 </style>
+
+<script>
+function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const toggleButton = document.getElementById('toggle-password');
+
+    const isHidden = passwordInput.type === 'password';
+
+    passwordInput.type = isHidden ? 'text' : 'password';
+    toggleButton.classList.toggle('active', isHidden);
+    toggleButton.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    toggleButton.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+}
+</script>
 
 <?php include __DIR__.'/partials/footer.php'; ?>
