@@ -49,7 +49,11 @@ Users can save plans, mark topics as complete, write notes, and take **AI-genera
 1. **User accounts** – registration, login, logout and a profile/settings page (name, email, skill level, password change). Passwords are stored as secure hashes.
 2. **AI learning-plan generation** – personalised roadmap created with the Gemini API.
 3. **Video suggestions** – optional YouTube links for each topic (needs a YouTube API key).
+<<<<<<< HEAD
 4. **Plan management** – save plans, view all plans, set one plan as *active*, delete plans, and search saved plans by title or domain.
+=======
+4. **Plan management** – save plans, view all plans, set one plan as *active*, delete plans, and filter plans by active or inactive status.
+>>>>>>> conflict-member2
 5. **Progress tracking** – mark topics complete and see overall completion.
 6. **Notes** – write and save notes against topics in a plan.
 7. **AI-generated quizzes** – three levels: topic (5 questions), step (10 questions) and full plan (50 questions). Quizzes are cached and answers are logged.
