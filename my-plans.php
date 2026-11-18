@@ -164,10 +164,13 @@ include __DIR__.'/partials/header.php';
                                 <button class="icon-btn" onclick="viewPlan(<?php echo $plan['id']; ?>)" title="View Plan">
                                     👁️
                                 </button>
-                                <button class="icon-btn" onclick="toggleActive(<?php echo $plan['id']; ?>)" 
-                                        title="<?php echo $plan['is_active'] ? 'Deactivate' : 'Set as Active'; ?>">
-                                    <?php echo $plan['is_active'] ? '⭐' : '☆'; ?>
-                                </button>
+                                
+<button class="icon-btn"
+        onclick="toggleActive(<?php echo $plan['id']; ?>, <?php echo $plan['is_active'] ? 'true' : 'false'; ?>)"
+        title="<?php echo $plan['is_active'] ? 'Deactivate' : 'Set as Active'; ?>">
+    <?php echo $plan['is_active'] ? '⭐' : '☆'; ?>
+</button>
+
                                 <button class="icon-btn danger" onclick="deletePlan(<?php echo $plan['id']; ?>)" title="Delete Plan">
                                     🗑️
                                 </button>
@@ -584,23 +587,36 @@ function viewPlan(planId) {
     window.location.href = '<?php echo url_path('/plan-details.php?id='); ?>' + planId;
 }
 
-function toggleActive(planId) {
-    if (confirm('Set this plan as your active learning plan?')) {
-        fetch('<?php echo url_path('/api/toggle-active.php'); ?>', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ plan_id: planId })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert(data.error || 'Failed to update plan');
-            }
-        });
+
+function toggleActive(planId, isActive) {
+    // Show the correct confirmation message
+    const message = isActive
+        ? 'Are you sure you want to deactivate this learning plan?'
+        : 'Set this plan as your active learning plan?';
+
+    if (!confirm(message)) {
+        return;
     }
+
+    fetch('<?php echo url_path('/api/toggle-active.php'); ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan_id: planId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.error || 'Failed to update plan');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating plan:', error);
+        alert('Something went wrong. Please try again.');
+    });
 }
+
 
 function deletePlan(planId) {
     if (confirm('Are you sure you want to delete this learning plan? This action cannot be undone.')) {

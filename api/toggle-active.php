@@ -1,3 +1,4 @@
+
 <?php
 require_once __DIR__ . '/../config.php';
 
@@ -19,25 +20,69 @@ if (!$plan_id) {
 }
 
 try {
-    // Verify plan belongs to user
-    $stmt = $db->prepare("SELECT id FROM learning_plans WHERE id = ? AND user_id = ?");
+    // Verify that the plan belongs to the logged-in user
+    $stmt = $db->prepare("
+        SELECT is_active
+        FROM learning_plans
+        WHERE id = ? AND user_id = ?
+    ");
     $stmt->execute([$plan_id, $_SESSION['user_id']]);
-    
-    if (!$stmt->fetch()) {
+    $plan = $stmt->fetch();
+
+    if (!$plan) {
         json_response(['error' => 'Plan not found'], 404);
     }
-    
-    // Deactivate all plans
-    $stmt = $db->prepare("UPDATE learning_plans SET is_active = 0 WHERE user_id = ?");
-    $stmt->execute([$_SESSION['user_id']]);
-    
-    // Activate this plan
-    $stmt = $db->prepare("UPDATE learning_plans SET is_active = 1 WHERE id = ?");
-    $stmt->execute([$plan_id]);
-    
-    json_response(['success' => true, 'message' => 'Plan activated successfully']);
-    
+
+    $currently_active = (int)$plan['is_active'] === 1;
+
+    $db->beginTransaction();
+
+    if ($currently_active) {
+        // Deactivate the selected plan
+        $stmt = $db->prepare("
+            UPDATE learning_plans
+            SET is_active = 0
+            WHERE id = ? AND user_id = ?
+        ");
+        $stmt->execute([$plan_id, $_SESSION['user_id']]);
+
+        $message = 'Plan deactivated successfully';
+        $new_status = false;
+
+    } else {
+        // Only one plan can be active at a time
+        $stmt = $db->prepare("
+            UPDATE learning_plans
+            SET is_active = 0
+            WHERE user_id = ?
+        ");
+        $stmt->execute([$_SESSION['user_id']]);
+
+        // Activate the selected plan
+        $stmt = $db->prepare("
+            UPDATE learning_plans
+            SET is_active = 1
+            WHERE id = ? AND user_id = ?
+        ");
+        $stmt->execute([$plan_id, $_SESSION['user_id']]);
+
+        $message = 'Plan activated successfully';
+        $new_status = true;
+    }
+
+    $db->commit();
+
+    json_response([
+        'success' => true,
+        'message' => $message,
+        'is_active' => $new_status
+    ]);
+
 } catch (PDOException $e) {
-    error_log("Error toggling active plan: " . $e->getMessage());
+    if ($db && $db->inTransaction()) {
+        $db->rollBack();
+    }
+
+    error_log('Error toggling active plan: ' . $e->getMessage());
     json_response(['error' => 'Failed to update plan'], 500);
 }
