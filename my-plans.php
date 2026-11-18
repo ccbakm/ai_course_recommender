@@ -113,15 +113,32 @@ include __DIR__.'/partials/header.php';
 <div class="plans-search">
     <label for="plan-search">Search Learning Plans</label>
 
-    <div class="search-input-wrapper">
-        <span class="search-icon" aria-hidden="true">🔍</span>
 
-        <input type="search"
-               id="plan-search"
-               placeholder="Search by plan title or domain..."
-               autocomplete="off">
-    </div>
+<div class="search-input-wrapper">
+    <span class="search-icon" aria-hidden="true">🔍</span>
+
+    <input type="search"
+           id="plan-search"
+           placeholder="Search by plan title or domain..."
+           autocomplete="off">
+
+    <!-- Clear Search Button -->
+    <button type="button"
+            id="clear-plan-search"
+            class="clear-search-btn"
+            aria-label="Clear search"
+            hidden>
+        <svg viewBox="0 0 24 24"
+             width="18" height="18"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2"
+             stroke-linecap="round">
+            <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+    </button>
 </div>
+</div> <!-- Close plans-search, keeping cards outside the search container -->
 
             <div class="plans-list">
                 <?php foreach ($plans as $plan): 
@@ -184,9 +201,25 @@ include __DIR__.'/partials/header.php';
                             </div>
                         </div>
                     </div>
+                
                 <?php endforeach; ?>
             </div>
+
+            <!-- Message displayed when search finds no plans -->
+            <div id="search-no-results"
+                 class="empty-state card"
+                 style="display: none;"
+                 role="status"
+                 aria-live="polite">
+
+                <div class="empty-icon">🔍</div>
+                <h3>No Matching Plans Found</h3>
+                <p>Try a different search term to find your learning plans.</p>
+
+            </div>
+
         <?php endif; ?>
+
     </div>
 </section>
 
@@ -270,9 +303,11 @@ include __DIR__.'/partials/header.php';
 
 
 /* Learning Plans Search */
+
 .plans-search {
     margin-bottom: 28px;
 }
+
 
 .plans-search label {
     display: block;
@@ -282,10 +317,12 @@ include __DIR__.'/partials/header.php';
     color: var(--text-primary);
 }
 
+
 .search-input-wrapper {
     position: relative;
     max-width: 500px;
 }
+
 
 .search-input-wrapper input {
     width: 100%;
@@ -316,6 +353,52 @@ include __DIR__.'/partials/header.php';
     font-size: 18px;
     pointer-events: none;
 }
+
+
+/* Clear Search Button */
+.clear-search-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clear-search-btn:hover {
+    background: rgba(124, 77, 255, 0.15);
+    color: var(--brand);
+}
+
+.clear-search-btn:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+/* Keep the button hidden when search is empty */
+.clear-search-btn[hidden] {
+    display: none;
+}
+
+/* Leave space inside the input for the button */
+.search-input-wrapper input {
+    padding-right: 50px;
+}
+
+/* Hide the browser's default clear button */
+.search-input-wrapper input::-webkit-search-cancel-button {
+    display: none;
+}
+
 
 
 .plans-list {
@@ -538,34 +621,63 @@ function deletePlan(planId) {
 }
 
 
+
+
 /* Live search for saved learning plans */
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('plan-search');
+    const clearButton = document.getElementById('clear-plan-search');
     const planCards = document.querySelectorAll('.plans-list .plan-card');
+    const noResults = document.getElementById('search-no-results');
 
-    if (!searchInput) return;
+    if (!searchInput || !clearButton) return;
 
-    searchInput.addEventListener('input', function () {
+    function filterPlans() {
         const searchText = searchInput.value.toLowerCase().trim();
+        let visibleCount = 0;
 
         planCards.forEach(function (card) {
-            // Get the plan title
             const title = card.querySelector('.plan-title-section h3')
                               .textContent.toLowerCase();
 
-            // Get the plan domain
             const domain = card.querySelector('.plan-meta .meta-item')
                                .textContent.toLowerCase();
 
-            // Check whether title or domain matches
             const matches = title.includes(searchText) ||
                             domain.includes(searchText);
 
-            // Show matching plans and hide others
             card.style.display = matches ? '' : 'none';
+
+            if (matches) {
+                visibleCount++;
+            }
         });
+
+        // Display message when no plans match
+        if (noResults) {
+            noResults.style.display =
+                visibleCount === 0 ? 'block' : 'none';
+        }
+
+        // Show clear button only when search contains text
+        clearButton.hidden = searchInput.value.length === 0;
+    }
+
+    // Filter plans as the user types
+    searchInput.addEventListener('input', filterPlans);
+
+    // Clear search when the X button is clicked
+    clearButton.addEventListener('click', function () {
+        searchInput.value = '';
+        filterPlans();
+        searchInput.focus();
     });
+
+    // Initialize the search state
+    filterPlans();
 });
+
+
 
 </script>
 
