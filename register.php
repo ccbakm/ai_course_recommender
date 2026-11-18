@@ -25,9 +25,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($name)) $errors[] = 'Name is required';
     if (empty($email)) $errors[] = 'Email is required';
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Invalid email format';
-    if (empty($password)) $errors[] = 'Password is required';
-    if (strlen($password) < 6) $errors[] = 'Password must be at least 6 characters';
-    if ($password !== $confirm_password) $errors[] = 'Passwords do not match';
+
+if (empty($password)) {
+    $errors[] = 'Password is required';
+} else {
+    if (strlen($password) < 8) {
+        $errors[] = 'Password must be at least 8 characters';
+    }
+
+    if (!preg_match('/[A-Za-z]/', $password)) {
+        $errors[] = 'Password must contain at least one letter';
+    }
+
+    if (!preg_match('/[0-9]/', $password)) {
+        $errors[] = 'Password must contain at least one number';
+    }
+}
+
+if ($password !== $confirm_password) {
+    $errors[] = 'Passwords do not match';
+}
+
     
     // Check if email already exists
     if (empty($errors) && $db) {
@@ -117,7 +135,7 @@ include __DIR__.'/partials/header.php';
     <label for="password">Password</label>
     <div class="password-field">
         <input type="password" id="password" name="password"
-               class="input" placeholder="Min. 6 characters" required>
+               class="input" placeholder="Create a strong password" required>
 
         <button type="button" class="password-toggle"
                 aria-label="Show password" aria-pressed="false"
@@ -139,7 +157,16 @@ include __DIR__.'/partials/header.php';
             </svg>
         </button>
     </div>
-    <small class="helper">At least 6 characters</small>
+    
+<small class="helper" id="password-requirements">
+    Password must contain:
+    <ul style="margin: 6px 0 0 20px; padding: 0;">
+        <li>At least 8 characters</li>
+        <li>At least one letter (A-Z)</li>
+        <li>At least one number (0-9)</li>
+    </ul>
+</small>
+
 </div>
 
 <div class="form-group">
@@ -396,6 +423,44 @@ function togglePasswordField(fieldId, button) {
         isHidden ? 'true' : 'false'
     );
 }
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const passwordInput = document.getElementById('password');
+    const requirements = document.querySelectorAll('#password-requirements li');
+
+    // Store the original requirement descriptions
+    const labels = Array.from(requirements, function (item) {
+        return item.textContent.trim();
+    });
+
+    function validatePasswordLive() {
+        const password = passwordInput.value;
+
+        // Check all three password requirements
+        const checks = [
+            password.length >= 8,
+            /[A-Za-z]/.test(password),
+            /[0-9]/.test(password)
+        ];
+
+        requirements.forEach(function (item, index) {
+            const valid = checks[index];
+
+            item.style.color = valid ? '#22c55e' : '#ef4444';
+            item.style.listStyleType = 'none';
+            item.textContent = (valid ? '✓ ' : '✗ ') + labels[index];
+        });
+    }
+
+    // Update requirements whenever the user types
+    passwordInput.addEventListener('input', validatePasswordLive);
+
+    // Check the initial password state
+    validatePasswordLive();
+});
 </script>
 
 
