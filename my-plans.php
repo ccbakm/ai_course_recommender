@@ -108,6 +108,21 @@ include __DIR__.'/partials/header.php';
                 </a>
             </div>
         <?php else: ?>
+
+<!-- Search learning plans -->
+<div class="plans-search">
+    <label for="plan-search">Search Learning Plans</label>
+
+    <div class="search-input-wrapper">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+
+        <input type="search"
+               id="plan-search"
+               placeholder="Search by plan title or domain..."
+               autocomplete="off">
+    </div>
+</div>
+
             <div class="plans-list">
                 <?php foreach ($plans as $plan): 
                     $plan_data = json_decode($plan['plan_data'], true);
@@ -252,6 +267,56 @@ include __DIR__.'/partials/header.php';
     color: var(--text-muted);
     margin-bottom: 24px;
 }
+
+
+/* Learning Plans Search */
+.plans-search {
+    margin-bottom: 28px;
+}
+
+.plans-search label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.search-input-wrapper {
+    position: relative;
+    max-width: 500px;
+}
+
+.search-input-wrapper input {
+    width: 100%;
+    padding: 14px 18px 14px 48px;
+    background: var(--bg-darker);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-input-wrapper input:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(124, 77, 255, 0.15);
+}
+
+.search-input-wrapper input::placeholder {
+    color: var(--text-muted);
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    pointer-events: none;
+}
+
 
 .plans-list {
     display: grid;
@@ -471,6 +536,37 @@ function deletePlan(planId) {
         });
     }
 }
+
+
+/* Live search for saved learning plans */
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('plan-search');
+    const planCards = document.querySelectorAll('.plans-list .plan-card');
+
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', function () {
+        const searchText = searchInput.value.toLowerCase().trim();
+
+        planCards.forEach(function (card) {
+            // Get the plan title
+            const title = card.querySelector('.plan-title-section h3')
+                              .textContent.toLowerCase();
+
+            // Get the plan domain
+            const domain = card.querySelector('.plan-meta .meta-item')
+                               .textContent.toLowerCase();
+
+            // Check whether title or domain matches
+            const matches = title.includes(searchText) ||
+                            domain.includes(searchText);
+
+            // Show matching plans and hide others
+            card.style.display = matches ? '' : 'none';
+        });
+    });
+});
+
 </script>
 
 <?php include __DIR__.'/partials/footer.php'; ?>
